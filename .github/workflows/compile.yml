@@ -69,7 +69,7 @@ jobs:
         lunch twrp_tb8766p1_64_bsp-eng
         
         # Force the system to explicitly build the full recovery binary targets
-        make bootimage vendor_bootimage recoveryimage -j$(nproc --all)
+        make bootimage vendorbootimage recoveryimage -j$(nproc --all)
 
     # ---> ADD THIS NEW STEP HERE <---
     - name: List Compiled Images
