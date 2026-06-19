@@ -35,18 +35,17 @@ jobs:
     - name: Clone Custom Device Tree
       run: |
         cd twrp
-        # 1. Clone using 'main' since that is your active GitHub branch
+        # 1. Clone your device tree repository using the main branch
         git clone https://github.com/yuksekberk034-droid/android_device_tcl_tb8766p1_64_bsp.git -b main device/tcl/tb8766p1_64_bsp
         
-        # 2. Extract the nested zip file into the targeted device build directory
+        # 2. Navigate inside the cloned folder where the zip is located
         cd device/tcl/tb8766p1_64_bsp
-        unzip -q tb8766p1_64_bsp.zip
         
-        # 3. Clean up the zip archive so Soong doesn't try to index it
-        rm -f tb8766p1_64_bsp.zip
+        # 3. Extract the file using the exact case-sensitive filename (Capital D)
+        unzip -q Device_tree.zip
         
-    - name: Unzip Device Tree
-      run: unzip device_tree.zip -d twrp/device/tcl/tb8766p1_64_bsp
+        # 4. Clean up the archive so the build tools don't try to index it
+        rm -f Device_tree.zip
   
     - name: Execute Compilation
       run: |
