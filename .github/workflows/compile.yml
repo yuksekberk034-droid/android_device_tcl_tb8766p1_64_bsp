@@ -57,19 +57,28 @@ jobs:
         
         # 4. Clean up the archive so the build tools don't try to index it
         rm -f Device_tree.zip
-  
+        
+      - name: Debug Device Tree Structure
+      run: |
+        echo "=== Listing files inside your device tree ==="
+        ls -la twrp/device/tcl/tb8766p1_64_bsp/
+        
     - name: Execute Compilation
       run: |
         cd twrp
         export ALLOW_MISSING_DEPENDENCIES=true
         export TW_DEFAULT_LANGUAGE="en"
-        
-        # Initialize the build environment
         source build/envsetup.sh
-        lunch twrp_tb8766p1_64_bsp-eng
         
-        # Force the system to explicitly build the full recovery binary targets
-        make bootimage vendorbootimage recoveryimage -j$(nproc --all)
+        # This automatically finds if your product file is named omni_, twrp_, or something else
+        CONF_FILE=$(basename $(ls device/tcl/tb8766p1_64_bsp/*.mk | grep -E '(omni|twrp|aosp|full)_' | head -n 1) .mk)
+        echo "Found target configuration: $CONF_FILE"
+        
+        # Launch using the discovered dynamic configuration target
+        lunch ${CONF_FILE}-eng
+        
+        # Execute build
+        make bootimage vendor_bootimage recoveryimage -j$(nproc --all)
 
     # ---> ADD THIS NEW STEP HERE <---
     - name: List Compiled Images
