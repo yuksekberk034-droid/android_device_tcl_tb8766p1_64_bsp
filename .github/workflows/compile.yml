@@ -31,8 +31,10 @@ jobs:
     - name: Install Repo Tool
       run: |
         mkdir -p ~/bin
+        # Fetch the official standalone python loader from Google
         curl https://googleapis.com > ~/bin/repo
         chmod a+x ~/bin/repo
+        # Create an absolute link to the binary path inside the runner environment
         sudo ln -sf ~/bin/repo /usr/bin/repo
 
     - name: Sync TWRP Source Code
