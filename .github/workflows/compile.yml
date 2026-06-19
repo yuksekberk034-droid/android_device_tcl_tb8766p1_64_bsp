@@ -54,9 +54,12 @@ jobs:
         source build/envsetup.sh
         lunch twrp_tb8766p1_64_bsp-eng
         make recoveryimage -j$(nproc --all)
-
+        
     - name: Upload Recovery Image Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: TWRP-Recovery-Image
-        path: twrp/out/target/product/tb8766p1_64_bsp/recovery.img
+        name: TWRP-Recovery-Images
+        # Uses wildcards to dynamically grab whatever images were compiled
+        path: |
+          twrp/out/target/product/tb8766p1_64_bsp/*.img
+          
