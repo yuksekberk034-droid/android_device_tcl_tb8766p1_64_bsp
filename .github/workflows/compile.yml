@@ -22,7 +22,6 @@ jobs:
         sudo apt-get clean
         echo "=== Disk Space After Cleanup ==="
         df -h
-        
 
     - name: Install Build Dependencies
       run: |
@@ -31,17 +30,18 @@ jobs:
 
     - name: Install Repo Tool
       run: |
-        sudo apt-get update
-        sudo apt-get install -y repo
+        mkdir -p ~/bin
+        curl https://googleapis.com > ~/bin/repo
+        chmod a+x ~/bin/repo
+        sudo ln -sf ~/bin/repo /usr/bin/repo
 
     - name: Sync TWRP Source Code
       run: |
         git config --global user.name "Builder"
         git config --global user.email "builder@local.com"
         mkdir twrp && cd twrp
-        # The correct AOSP minimal manifest for Android 10+ wrapped securely in quotes
         repo init --depth=1 -u "https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git" -b twrp-12.1
-        repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
+        repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags --current-branch
 
     - name: Clone Custom Device Tree
       run: |
@@ -57,12 +57,12 @@ jobs:
         
         # 4. Clean up the archive so the build tools don't try to index it
         rm -f Device_tree.zip
-        
-      - name: Debug Device Tree Structure
+
+    - name: Debug Device Tree Structure
       run: |
         echo "=== Listing files inside your device tree ==="
         ls -la twrp/device/tcl/tb8766p1_64_bsp/
-        
+
     - name: Execute Compilation
       run: |
         cd twrp
@@ -80,11 +80,10 @@ jobs:
         # Execute build
         make bootimage vendor_bootimage recoveryimage -j$(nproc --all)
 
-    # ---> ADD THIS NEW STEP HERE <---
     - name: List Compiled Images
       run: |
         echo "=== Checking target product directory ==="
-        ls -la twrp/out/target/product/tb8766p1_64_bsp/
+        ls -la twrp/out/target/product/tb8766p1_64_bsp/ || echo "Directory not found yet!"
         echo "=== Only listing generated .img files ==="
         ls -la twrp/out/target/product/tb8766p1_64_bsp/*.img || echo "No .img files found yet!"
 
@@ -94,5 +93,3 @@ jobs:
         name: TWRP-Recovery-Images
         path: |
           twrp/out/target/product/tb8766p1_64_bsp/*.img
-          
-          
